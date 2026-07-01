@@ -1,0 +1,36 @@
+package com.example.demo.appointment.service;
+
+import com.example.demo.appointment.dto.AppointmentRequest;
+import com.example.demo.appointment.dto.AppointmentResponse;
+import com.example.demo.appointment.entity.Appointment.AppointmentStatus;
+import java.util.List;
+
+public interface AppointmentService {
+
+    // book appointment
+    AppointmentResponse bookAppointment(AppointmentRequest request);
+
+    // get all appointments
+    List<AppointmentResponse> getAllAppointments();
+
+    // get appointment by id
+    AppointmentResponse getAppointmentById(Long id);
+
+    // get appointments by patient
+    List<AppointmentResponse> getAppointmentsByPatient(Long patientId);
+    
+    AppointmentResponse bookAppointment(
+    	    AppointmentRequest request, String token);
+
+    // get appointments by doctor
+    List<AppointmentResponse> getAppointmentsByDoctor(Long doctorId);
+
+    // update appointment status
+    AppointmentResponse updateStatus(Long id, AppointmentStatus status);
+
+    // cancel appointment
+    AppointmentResponse cancelAppointment(Long id);
+
+    // delete appointment
+    void deleteAppointment(Long id);
+}

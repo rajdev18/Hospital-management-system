@@ -1,0 +1,92 @@
+package com.example.demo.doctor.controller;
+
+import com.example.demo.doctor.dto.LoginRequest;
+import com.example.demo.doctor.dto.LoginResponse;
+import com.example.demo.doctor.entity.Doctor;
+import com.example.demo.doctor.service.DoctorService;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@SecurityRequirement(name = "bearerAuth")
+@RestController
+@RequestMapping("/api/doctors")
+public class DoctorController {
+
+    @Autowired
+    private DoctorService doctorService;
+
+    // register doctor
+    @PostMapping("/register")
+    public ResponseEntity<Doctor> register(@Valid @RequestBody Doctor doctor) {
+        return ResponseEntity.ok(doctorService.registerDoctor(doctor));
+    }
+
+    // login doctor
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        String token = doctorService.loginDoctor(
+            loginRequest.getEmail(),
+            loginRequest.getPassword()
+        );
+        return ResponseEntity.ok(new LoginResponse(
+            token,
+            loginRequest.getEmail(),
+            "Login successful!"
+        ));
+    }
+
+    // get all doctors
+    @GetMapping
+    public ResponseEntity<List<Doctor>> getAllDoctors() {
+        return ResponseEntity.ok(doctorService.getAllDoctors());
+    }
+
+    // get doctor by id
+    @GetMapping("/{id}")
+    public ResponseEntity<Doctor> getDoctorById(@PathVariable Long id) {
+        return doctorService.getDoctorById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // get doctors by specialization
+    @GetMapping("/specialization/{specialization}")
+    public ResponseEntity<List<Doctor>> getBySpecialization(
+            @PathVariable String specialization) {
+        return ResponseEntity.ok(
+            doctorService.getDoctorsBySpecialization(specialization));
+    }
+
+    // get available doctors
+    @GetMapping("/available")
+    public ResponseEntity<List<Doctor>> getAvailableDoctors() {
+        return ResponseEntity.ok(doctorService.getAvailableDoctors());
+    }
+
+    // toggle availability
+    @PutMapping("/{id}/toggle-availability")
+    public ResponseEntity<Doctor> toggleAvailability(@PathVariable Long id) {
+        return ResponseEntity.ok(doctorService.toggleAvailability(id));
+    }
+
+    // update doctor
+    @PutMapping("/{id}")
+    public ResponseEntity<Doctor> updateDoctor(
+            @PathVariable Long id,
+            @RequestBody Doctor doctor) {
+        return ResponseEntity.ok(doctorService.updateDoctor(id, doctor));
+    }
+
+    // delete doctor
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteDoctor(@PathVariable Long id) {
+        doctorService.deleteDoctor(id);
+        return ResponseEntity.ok("Doctor deleted successfully!");
+    }
+}
